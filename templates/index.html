@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Token Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LLM Token Visualizer</h1>
+            <p>Visualize and interact with token generation from language models</p>
+        </header>
+
+        <div class="controls">
+            <div class="model-section">
+                <label for="model-select">Model:</label>
+                <select id="model-select">
+                    <option value="gpt2">GPT-2</option>
+                    <option value="gpt2-medium">GPT-2 Medium</option>
+                    <option value="distilgpt2">DistilGPT-2</option>
+                </select>
+                <button id="initialize-btn" class="btn btn-primary">Initialize Model</button>
+                <span id="model-status" class="status"></span>
+            </div>
+
+            <div class="input-section">
+                <label for="prompt-input">Input Prompt:</label>
+                <textarea id="prompt-input" placeholder="Enter your prompt here..." rows="3"></textarea>
+            </div>
+
+            <div class="generation-controls">
+                <button id="generate-next-btn" class="btn btn-secondary" disabled>Generate Next Token</button>
+                <button id="generate-all-btn" class="btn btn-secondary" disabled>Generate to End</button>
+                <button id="reset-btn" class="btn btn-danger">Reset</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <h3>Generated Text:</h3>
+            <div id="generated-text" class="text-display">
+                <span class="prompt-text"></span>
+                <span class="generated-tokens"></span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="token-info">
+                <h4>Token Information</h4>
+                <div id="token-details"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

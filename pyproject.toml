@@ -1,0 +1,13 @@
+[project]
+name = "see-and-select-tokens"
+version = "0.1.0"
+description = "Web application for visualizing and selecting LLM tokens"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.0.0",
+    "transformers>=4.35.0",
+    "torch>=2.1.0",
+    "numpy>=1.24.0",
+    "requests>=2.31.0"
+]
