@@ -150,3 +150,7 @@ Changed the token colors and probability thresholds (done by hand). Fixed the pr
 Added comprehensive sampling parameter controls with sliders for temperature, top-p, and top-k parameters. The slider configuration is done through the config.json file. Mostly done by Cascade with the following prompt:
 
 > Now I want to add some new functionality. I want to allow the user to be able to control the temperature, top-p, and top-k values that are used in token sampling. The user will be able to set those values with slider bars, and for each one, slider's minimum, maximum, and default values should be read from the config.json file. Those 3 values, temperature, top-p, and top-k, should then be used by get_next_token_probabilities to chose the selected_token_id.
+
+### Version 0.1.5
+
+Added command-line arguments for host and port. Done by Cascade.
