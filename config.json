@@ -46,5 +46,9 @@
             "default": 50,
             "step": 1
         }
+    },
+    "server": {
+        "host": "0.0.0.0",
+        "port": 8080
     }
 }

@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from typing import List, Dict, Tuple
 import json
 import os
+import argparse
 
 app = Flask(__name__)
 
@@ -219,5 +220,15 @@ def generate_to_end():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(description='LLM Token Visualizer')
+    parser.add_argument('--host', type=str, default=config['server']['host'],
+                        help=f"Host to bind to (default: {config['server']['host']})")
+    parser.add_argument('--port', type=int, default=config['server']['port'],
+                        help=f"Port to bind to (default: {config['server']['port']})")
+    return parser.parse_args()
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    args = parse_args()
+    app.run(debug=True, host=args.host, port=args.port)

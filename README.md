@@ -27,8 +27,13 @@ A web application that allows users to visualize and interact with individual to
    ```bash
    uv run main.py
    ```
+   
+   Or with custom host/port:
+   ```bash
+   uv run main.py --host 127.0.0.1 --port 3000
+   ```
 
-2. Open your browser and navigate to `http://localhost:5001`
+2. Open your browser and navigate to `http://localhost:8080` (or your custom host/port)
 
 3. **Initialize the Model**:
    - Available models are loaded automatically from configuration
