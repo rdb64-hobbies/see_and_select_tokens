@@ -6,9 +6,9 @@ A web application that allows users to visualize and interact with individual to
 
 - **Interactive Token Generation**: Generate tokens one by one or all at once
 - **Probability Visualization**: Each token is color-coded based on its probability
-- **Alternative Token Selection**: Click on any token to see top-10 alternatives with probabilities
+- **Alternative Token Selection**: Click on any token to see top alternatives with probabilities
 - **Regeneration from Any Point**: Select an alternative token to restart generation from that position
-- **Multiple Model Support**: Choose from GPT-2, GPT-2 Medium, or DistilGPT-2
+- **Multiple Model Support**: Choose from several Hugging Face models
 - **Real-time Token Details**: View detailed information about selected tokens
 
 ## Installation
@@ -24,13 +24,13 @@ A web application that allows users to visualize and interact with individual to
 
 1. Start the Flask server:
    ```bash
-   uv run python main.py
+   uv run main.py
    ```
 
-2. Open your browser and navigate to `http://localhost:5000`
+2. Open your browser and navigate to `http://localhost:5001`
 
 3. **Initialize the Model**:
-   - Select a model from the dropdown (GPT-2, GPT-2 Medium, or DistilGPT-2)
+   - Select a model from the dropdown
    - Click "Initialize Model" and wait for it to load
 
 4. **Generate Tokens**:
@@ -100,3 +100,9 @@ Models are automatically downloaded on first use and cached locally.
 - GPU acceleration is used automatically if available
 - Token generation typically takes 100-500ms per token
 - Memory usage: ~1-4GB depending on model size
+
+## Software Development
+
+The first version of this application (and everything in this README file above this point)was created entirely by Windsurf Cascade from the following prompt:
+
+> You are acting as a senior system architect and full stack engineer, and your task is to design and help build a Web application that allows the user to see and select individual tokens as they are generated from an LLM. The input from the user is a text prompt. That text prompt is provided as the input to an LLM which is used to generate and select tokens, one by one, which are displayed as output to the user. Each selected token should be displayed with its background color according to its associated probabilty and with a drop-down menu that displays the top 10 tokens considered with their associated probabilities. The user can select a token from the drop-down menu which then resets the token generation process back to that position. There should be a button that allows the user to generate a single next token and another button that allows the user to generate tokens all the way to the end. At each token-selection step, you will first need to have the LLM generate the next-token probabilities. From those probabilities, you can do random sampling to select the next token. That selected token is what gets displayed to the user with the background color according to the associated probability. In addition to selecting the next token, you need to save the tokens with the top 10 probabilities to generate the drop-down menu for that selected token. Use Python for as much of the code as possible, and use uv, not pip, to manage the environment. Also, use Flask for the front-end.
