@@ -21,10 +21,10 @@ class TokenGenerator:
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
     
-    def get_next_token_probabilities(self, text: str, top_k: int = 10) -> Tuple[List[Dict], int]:
+    def get_next_token_probabilities(self, text: str, top_k: int = 10) -> Tuple[List[Dict], Dict]:
         """
         Get the top-k token probabilities for the next token given the input text.
-        Returns: (top_k_tokens_with_probs, selected_token_id)
+        Returns: (top_k_tokens_with_probs, selected_token_dict)
         """
         # Tokenize input
         inputs = self.tokenizer.encode(text, return_tensors="pt").to(self.device)
@@ -42,6 +42,15 @@ class TokenGenerator:
             
             # Sample from the distribution for the selected token
             selected_token_id = torch.multinomial(probs, 1).item()
+            selected_token_text = self.tokenizer.decode([selected_token_id])
+            selected_token_prob = probs[selected_token_id].item()
+            
+            # Create selected token dictionary
+            selected_token = {
+                'token_id': selected_token_id,
+                'token_text': selected_token_text,
+                'probability': selected_token_prob
+            }
             
             # Convert to list of dictionaries
             top_k_tokens = []
@@ -56,7 +65,7 @@ class TokenGenerator:
                     'probability': probability
                 })
             
-            return top_k_tokens, selected_token_id
+            return top_k_tokens, selected_token
     
     def decode_token(self, token_id: int) -> str:
         """Decode a single token ID to text."""
@@ -95,23 +104,11 @@ def generate_next_token():
         top_k = data.get('top_k', 10)
         
         # Get token probabilities and selected token
-        top_k_tokens, selected_token_id = token_gen.get_next_token_probabilities(text, top_k)
-        selected_token_text = token_gen.decode_token(selected_token_id)
-        
-        # Find the selected token's probability from the top-k list
-        selected_prob = 0.0
-        for token_info in top_k_tokens:
-            if token_info['token_id'] == selected_token_id:
-                selected_prob = token_info['probability']
-                break
+        top_k_tokens, selected_token = token_gen.get_next_token_probabilities(text, top_k)
         
         return jsonify({
             'status': 'success',
-            'selected_token': {
-                'token_id': selected_token_id,
-                'token_text': selected_token_text,
-                'probability': selected_prob
-            },
+            'selected_token': selected_token,
             'top_k_tokens': top_k_tokens
         })
     
@@ -130,34 +127,23 @@ def generate_to_end():
         data = request.json
         text = data.get('text', '')
         max_tokens = data.get('max_tokens', 50)
+        top_k = data.get('top_k', 10)
         
         generated_tokens = []
         current_text = text
         
         for _ in range(max_tokens):
-            top_k_tokens, selected_token_id = token_gen.get_next_token_probabilities(current_text)
-            selected_token_text = token_gen.decode_token(selected_token_id)
-            
-            # Find selected token probability
-            selected_prob = 0.0
-            for token_info in top_k_tokens:
-                if token_info['token_id'] == selected_token_id:
-                    selected_prob = token_info['probability']
-                    break
+            top_k_tokens, selected_token = token_gen.get_next_token_probabilities(current_text, top_k)
             
             generated_tokens.append({
-                'selected_token': {
-                    'token_id': selected_token_id,
-                    'token_text': selected_token_text,
-                    'probability': selected_prob
-                },
+                'selected_token': selected_token,
                 'top_k_tokens': top_k_tokens
             })
             
-            current_text += selected_token_text
+            current_text += selected_token['token_text']
             
             # Stop if we hit an end token
-            if selected_token_id == token_gen.tokenizer.eos_token_id:
+            if selected_token['token_id'] == token_gen.tokenizer.eos_token_id:
                 break
         
         return jsonify({
