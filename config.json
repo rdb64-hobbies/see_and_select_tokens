@@ -1,0 +1,29 @@
+{
+    "available_models": [
+        {
+            "id": "openai/gpt-oss-20b",
+            "name": "GPT-OSS-20B",
+            "description": "20B parameters, open source"
+        },
+        {
+            "id": "google/gemma-3-270m",
+            "name": "GEMMA-3-270M",
+            "description": "270M parameters, open source"
+        },
+        {
+            "id": "meta-llama/Llama-3.2-1B",
+            "name": "Llama-3.2-1B",
+            "description": "1B parameters, open source"
+        },
+        {
+            "id": "gpt2",
+            "name": "GPT-2",
+            "description": "124M parameters, fastest generation"
+        }
+    ],
+    "default_model": "gpt2",
+    "generation_settings": {
+        "default_top_k": 10,
+        "default_max_tokens": 50
+    }
+}
