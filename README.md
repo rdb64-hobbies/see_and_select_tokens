@@ -8,6 +8,7 @@ A web application that allows users to visualize and interact with individual to
 - **Probability Visualization**: Each token is color-coded based on its probability
 - **Alternative Token Selection**: Click on any token to see top alternatives with probabilities
 - **Regeneration from Any Point**: Select an alternative token to restart generation from that position
+- **Sampling Parameter Control**: Adjust temperature, top-p, and top-k parameters
 - **Multiple Model Support**: Choose from several Hugging Face models
 - **Real-time Token Details**: View detailed information about selected tokens
 
@@ -31,20 +32,24 @@ A web application that allows users to visualize and interact with individual to
 
 3. **Initialize the Model**:
    - Available models are loaded automatically from configuration
-   - Select a model from the dropdown (shows descriptions)
+   - Select a model from the dropdown
    - Click "Initialize Model" and wait for it to load
 
-4. **Generate Tokens**:
+4. **Enter a Prompt**:
    - Enter your prompt in the text area
+
+5. **Adjust Sampling Parameters**:
+   - Adjust the temperature, top-p, and top-k sliders to change the sampling behavior
+
+6. **Generate Tokens**:
    - Click "Generate Next Token" to generate one token at a time
    - Click "Generate to End" to generate multiple tokens automatically
+   - Click "Reset" to clear all generated tokens and start over
 
-5. **Interact with Tokens**:
+7. **Interact with Tokens**:
    - Each generated token is colored based on its probability
    - Click on any token to see alternative options
    - Select an alternative to restart generation from that point
-
-6. **Reset**: Click "Reset" to clear all generated tokens and start over
 
 ## Technical Architecture
 
@@ -53,6 +58,7 @@ A web application that allows users to visualize and interact with individual to
 - **Configuration System**: Models and settings loaded from `config.json`
 - **Flask Routes**:
   - `/`: Serves the main application
+  - `/config`: Returns the full configuration
   - `/models`: Returns available models from configuration
   - `/initialize`: Initializes the selected model with validation
   - `/generate_next_token`: Generates a single token with alternatives
@@ -62,12 +68,6 @@ A web application that allows users to visualize and interact with individual to
 - **TokenVisualizer Class**: Manages the interactive UI
 - **Responsive Design**: Works on desktop and mobile devices
 - **Real-time Updates**: Dynamic token rendering and probability visualization
-
-### Key Components
-- **Probability Calculation**: Uses PyTorch softmax on model logits
-- **Token Sampling**: Multinomial sampling from probability distribution
-- **Alternative Generation**: Top-k token selection with probabilities
-- **State Management**: Tracks token history for regeneration
 
 ## Dependencies
 
@@ -108,7 +108,7 @@ Models are automatically downloaded on first use and cached locally.
 - First model initialization may take 1-2 minutes
 - GPU acceleration is used automatically if available
 - Token generation typically takes 100-500ms per token
-- Memory usage: ~1-4GB depending on model size
+- Memory usage: depends on model size
 
 ## Software Development and Version History
 
@@ -139,3 +139,9 @@ Made model selection configurable through a configuration file system. Done by C
 ### Version 0.1.3
 
 Changed the token colors and probability thresholds (done by hand). Fixed the problem with the dropdown menu appearing below the generated tokens (done by Cascade).
+
+### Version 0.1.4
+
+Added comprehensive sampling parameter controls with sliders for temperature, top-p, and top-k parameters. The slider configuration is done through the config.json file. Mostly done by Cascade with the following prompt:
+
+> Now I want to add some new functionality. I want to allow the user to be able to control the temperature, top-p, and top-k values that are used in token sampling. The user will be able to set those values with slider bars, and for each one, slider's minimum, maximum, and default values should be read from the config.json file. Those 3 values, temperature, top-p, and top-k, should then be used by get_next_token_probabilities to chose the selected_token_id.

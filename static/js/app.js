@@ -5,10 +5,11 @@ class TokenVisualizer {
         this.originalPrompt = '';
         this.generatedTokensData = [];
         this.availableModels = [];
+        this.config = null;
         
         this.initializeElements();
         this.bindEvents();
-        this.loadAvailableModels();
+        this.loadConfig();
     }
 
     initializeElements() {
@@ -24,6 +25,14 @@ class TokenVisualizer {
         this.promptTextSpan = document.querySelector('.prompt-text');
         this.generatedTokensSpan = document.querySelector('.generated-tokens');
         this.tokenDetails = document.getElementById('token-details');
+        
+        // Sampling parameter sliders
+        this.temperatureSlider = document.getElementById('temperature-slider');
+        this.temperatureValue = document.getElementById('temperature-value');
+        this.topPSlider = document.getElementById('top-p-slider');
+        this.topPValue = document.getElementById('top-p-value');
+        this.topKSlider = document.getElementById('top-k-slider');
+        this.topKValue = document.getElementById('top-k-value');
     }
 
     bindEvents() {
@@ -34,6 +43,11 @@ class TokenVisualizer {
         this.promptInput.addEventListener('input', () => this.updatePromptDisplay());
         this.modelSelect.addEventListener('change', () => this.onModelSelectionChange());
         
+        // Slider events
+        this.temperatureSlider.addEventListener('input', () => this.updateSliderValue('temperature'));
+        this.topPSlider.addEventListener('input', () => this.updateSliderValue('top-p'));
+        this.topKSlider.addEventListener('input', () => this.updateSliderValue('top-k'));
+        
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.token')) {
@@ -42,21 +56,61 @@ class TokenVisualizer {
         });
     }
 
-    async loadAvailableModels() {
+    async loadConfig() {
         try {
-            const response = await fetch('/models');
-            const data = await response.json();
+            const response = await fetch('/config');
+            this.config = await response.json();
             
-            if (data.status === 'success') {
-                this.availableModels = data.models;
-                this.populateModelSelect(data.models, data.default_model);
+            if (this.config.available_models) {
+                this.availableModels = this.config.available_models;
+                this.populateModelSelect(this.config.available_models, this.config.default_model);
+                this.initializeSamplingControls();
             } else {
-                console.error('Failed to load models:', data.message);
+                console.error('Failed to load config');
                 this.modelSelect.innerHTML = '<option value="">Failed to load models</option>';
             }
         } catch (error) {
-            console.error('Error loading models:', error);
+            console.error('Error loading config:', error);
             this.modelSelect.innerHTML = '<option value="">Error loading models</option>';
+        }
+    }
+    
+    initializeSamplingControls() {
+        const params = this.config.sampling_parameters;
+        
+        // Temperature
+        this.temperatureSlider.min = params.temperature.min;
+        this.temperatureSlider.max = params.temperature.max;
+        this.temperatureSlider.step = params.temperature.step;
+        this.temperatureSlider.value = params.temperature.default;
+        this.temperatureValue.textContent = params.temperature.default;
+        
+        // Top-p
+        this.topPSlider.min = params.top_p.min;
+        this.topPSlider.max = params.top_p.max;
+        this.topPSlider.step = params.top_p.step;
+        this.topPSlider.value = params.top_p.default;
+        this.topPValue.textContent = params.top_p.default;
+        
+        // Top-k
+        this.topKSlider.min = params.top_k.min;
+        this.topKSlider.max = params.top_k.max;
+        this.topKSlider.step = params.top_k.step;
+        this.topKSlider.value = params.top_k.default;
+        this.topKValue.textContent = params.top_k.default;
+    }
+    
+    updateSliderValue(paramType) {
+        switch(paramType) {
+            case 'temperature':
+                this.temperatureValue.textContent = this.temperatureSlider.value;
+                break;
+            case 'top-p':
+                this.topPValue.textContent = this.topPSlider.value;
+                break;
+            case 'top-k':
+                this.topKValue.textContent = this.topKSlider.value;
+                break;
         }
     }
 
@@ -157,7 +211,9 @@ class TokenVisualizer {
                 },
                 body: JSON.stringify({ 
                     text: currentText,
-                    top_k: 10 
+                    top_k: parseInt(this.topKSlider.value),
+                    temperature: parseFloat(this.temperatureSlider.value),
+                    top_p: parseFloat(this.topPSlider.value)
                 })
             });
 
@@ -192,7 +248,9 @@ class TokenVisualizer {
                 body: JSON.stringify({ 
                     text: currentText,
                     max_tokens: 50,
-                    top_k: 10 
+                    top_k: parseInt(this.topKSlider.value),
+                    temperature: parseFloat(this.temperatureSlider.value),
+                    top_p: parseFloat(this.topPSlider.value)
                 })
             });
 

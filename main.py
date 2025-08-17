@@ -31,9 +31,9 @@ class TokenGenerator:
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
     
-    def get_next_token_probabilities(self, text: str, top_k: int = 10) -> Tuple[List[Dict], Dict]:
+    def get_next_token_probabilities(self, text: str, top_k: int = 10, temperature: float = 1.0, top_p: float = 0.9) -> Tuple[List[Dict], Dict]:
         """
-        Get the top-k token probabilities for the next token given the input text.
+        Given the text input, get the top token candidates and the selected token.
         Returns: (top_k_tokens_with_probs, selected_token_dict)
         """
         # Tokenize input
@@ -44,13 +44,40 @@ class TokenGenerator:
             outputs = self.model(inputs)
             logits = outputs.logits[0, -1, :]  # Get logits for the last token
             
+            # Apply temperature scaling
+            if temperature != 1.0:
+                logits = logits / temperature
+            
             # Convert to probabilities
             probs = torch.softmax(logits, dim=-1)
             
-            # Get top-k tokens and their probabilities
-            top_k_probs, top_k_indices = torch.topk(probs, top_k)
+            # Apply top-k filtering
+            if top_k > 0:
+                top_k_probs, top_k_indices = torch.topk(probs, min(top_k, probs.size(-1)))
+                # Zero out probabilities for tokens not in top-k
+                filtered_probs = torch.zeros_like(probs)
+                filtered_probs.scatter_(0, top_k_indices, top_k_probs)
+                probs = filtered_probs
             
-            # Sample from the distribution for the selected token
+            # Apply top-p (nucleus) filtering
+            if top_p < 1.0:
+                sorted_probs, sorted_indices = torch.sort(probs, descending=True)
+                cumulative_probs = torch.cumsum(sorted_probs, dim=0)
+                
+                # Find the cutoff point for top-p (include the token that exceeds top_p)
+                cutoff_index = torch.where(cumulative_probs > top_p)[0]
+                if len(cutoff_index) > 0:
+                    cutoff_index = cutoff_index[0] + 1  # Include the token that exceeded top_p
+                    # Zero out probabilities beyond the cutoff
+                    sorted_probs[cutoff_index:] = 0
+                    # Restore original order
+                    probs = torch.zeros_like(probs)
+                    probs.scatter_(0, sorted_indices, sorted_probs)
+            
+            # Renormalize probabilities
+            probs = probs / probs.sum()
+            
+            # Sample from the filtered distribution for the selected token
             selected_token_id = torch.multinomial(probs, 1).item()
             selected_token_text = self.tokenizer.decode([selected_token_id])
             selected_token_prob = probs[selected_token_id].item()
@@ -62,20 +89,23 @@ class TokenGenerator:
                 'probability': selected_token_prob
             }
             
+            # Get top tokens for display (from final filtered probabilities)
+            display_top_probs, display_top_indices = torch.topk(probs, min(12, (probs > 0).sum().item()))
+            
             # Convert to list of dictionaries
-            top_k_tokens = []
-            for i in range(top_k):
-                token_id = top_k_indices[i].item()
+            display_top_tokens = []
+            for i in range(len(display_top_indices)):
+                token_id = display_top_indices[i].item()
                 token_text = self.tokenizer.decode([token_id])
-                probability = top_k_probs[i].item()
+                probability = display_top_probs[i].item()
                 
-                top_k_tokens.append({
+                display_top_tokens.append({
                     'token_id': token_id,
                     'token_text': token_text,
                     'probability': probability
                 })
             
-            return top_k_tokens, selected_token
+            return display_top_tokens, selected_token
     
     def decode_token(self, token_id: int) -> str:
         """Decode a single token ID to text."""
@@ -88,6 +118,11 @@ token_gen = None
 def index():
     """Serve the main application page."""
     return render_template('index.html')
+
+@app.route('/config')
+def get_config():
+    """Return the configuration including available models and sampling parameters."""
+    return jsonify(config)
 
 @app.route('/models', methods=['GET'])
 def get_available_models():
@@ -128,9 +163,11 @@ def generate_next_token():
         data = request.json
         text = data.get('text', '')
         top_k = data.get('top_k', 10)
+        temperature = data.get('temperature', config['sampling_parameters']['temperature']['default'])
+        top_p = data.get('top_p', config['sampling_parameters']['top_p']['default'])
         
         # Get token probabilities and selected token
-        top_k_tokens, selected_token = token_gen.get_next_token_probabilities(text, top_k)
+        top_k_tokens, selected_token = token_gen.get_next_token_probabilities(text, top_k, temperature, top_p)
         
         return jsonify({
             'status': 'success',
@@ -154,12 +191,14 @@ def generate_to_end():
         text = data.get('text', '')
         max_tokens = data.get('max_tokens', 50)
         top_k = data.get('top_k', 10)
+        temperature = data.get('temperature', config['sampling_parameters']['temperature']['default'])
+        top_p = data.get('top_p', config['sampling_parameters']['top_p']['default'])
         
         generated_tokens = []
         current_text = text
         
         for _ in range(max_tokens):
-            top_k_tokens, selected_token = token_gen.get_next_token_probabilities(current_text, top_k)
+            top_k_tokens, selected_token = token_gen.get_next_token_probabilities(current_text, top_k, temperature, top_p)
             
             generated_tokens.append({
                 'selected_token': selected_token,
