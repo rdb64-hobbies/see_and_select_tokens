@@ -30,7 +30,8 @@ A web application that allows users to visualize and interact with individual to
 2. Open your browser and navigate to `http://localhost:5001`
 
 3. **Initialize the Model**:
-   - Select a model from the dropdown
+   - Available models are loaded automatically from configuration
+   - Select a model from the dropdown (shows descriptions)
    - Click "Initialize Model" and wait for it to load
 
 4. **Generate Tokens**:
@@ -39,12 +40,7 @@ A web application that allows users to visualize and interact with individual to
    - Click "Generate to End" to generate multiple tokens automatically
 
 5. **Interact with Tokens**:
-   - Each generated token is colored based on its probability:
-     - Green: Very high probability (>70%)
-     - Blue: High probability (50-70%)
-     - Purple: Medium probability (30-50%)
-     - Orange: Low probability (10-30%)
-     - Red: Very low probability (<10%)
+   - Each generated token is colored based on its probability
    - Click on any token to see alternative options
    - Select an alternative to restart generation from that point
 
@@ -54,9 +50,11 @@ A web application that allows users to visualize and interact with individual to
 
 ### Backend (Python/Flask)
 - **TokenGenerator Class**: Handles model loading and token generation
+- **Configuration System**: Models and settings loaded from `config.json`
 - **Flask Routes**:
   - `/`: Serves the main application
-  - `/initialize`: Initializes the selected model
+  - `/models`: Returns available models from configuration
+  - `/initialize`: Initializes the selected model with validation
   - `/generate_next_token`: Generates a single token with alternatives
   - `/generate_to_end`: Generates multiple tokens until completion
 
@@ -78,12 +76,23 @@ A web application that allows users to visualize and interact with individual to
 - Transformers 4.35+: Hugging Face model library
 - NumPy: Numerical computations
 
-## Model Information
+## Model Configuration
 
-The application uses Hugging Face transformers models:
-- **GPT-2**: 124M parameters, fastest generation
-- **GPT-2 Medium**: 355M parameters, better quality
-- **DistilGPT-2**: 82M parameters, lightweight version
+The application uses a configurable list of models via `config.json`.
+
+To add new models, edit `config.json`:
+```json
+{
+  "available_models": [
+    {
+      "id": "model-name",
+      "name": "Display Name",
+      "description": "Model description"
+    }
+  ],
+  "default_model": "model-name"
+}
+```
 
 Models are automatically downloaded on first use and cached locally.
 
@@ -120,3 +129,9 @@ Removed some redundancy in the backend code. This was also done by Cascade with 
 Included the top_k parameter in generate_to_end to be consistent with generate_next_token. Also done by Cascade with the following prompt:
 
 > Next, I think the generate_to_end function, like generate_next_token, should receive a top_k parameter in the request.json.
+
+### Version 0.1.2
+
+Made model selection configurable through a configuration file system. Done by Cascade with the following prompt:
+
+> Now let's make the set of available models in the model-select menu be configurable. Take the list of available models from a configuaration file. Also, remove the gpt2 default from the back-end functions.

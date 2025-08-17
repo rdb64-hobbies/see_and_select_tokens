@@ -2,11 +2,21 @@ from flask import Flask, render_template, request, jsonify
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from typing import List, Dict, Tuple
+import json
+import os
 
 app = Flask(__name__)
 
+# Load configuration
+def load_config():
+    config_path = os.path.join(os.path.dirname(__file__), 'config.json')
+    with open(config_path, 'r') as f:
+        return json.load(f)
+
+config = load_config()
+
 class TokenGenerator:
-    def __init__(self, model_name="gpt2"):
+    def __init__(self, model_name):
         """Initialize the token generator with a pre-trained model."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f"Using device: {self.device}")
@@ -79,12 +89,28 @@ def index():
     """Serve the main application page."""
     return render_template('index.html')
 
+@app.route('/models', methods=['GET'])
+def get_available_models():
+    """Return the list of available models from configuration."""
+    return jsonify({
+        'status': 'success',
+        'models': config['available_models'],
+        'default_model': config.get('default_model')
+    })
+
 @app.route('/initialize', methods=['POST'])
 def initialize_model():
     """Initialize the token generator model."""
     global token_gen
     try:
-        model_name = request.json.get('model_name', 'gpt2')
+        model_name = request.json.get('model_name')
+        if not model_name:
+            return jsonify({'status': 'error', 'message': 'Model name is required'}), 400
+        
+        # Validate model name against config
+        available_models = [model['id'] for model in config['available_models']]
+        if model_name not in available_models:
+            return jsonify({'status': 'error', 'message': f'Model {model_name} not available'}), 400
         token_gen = TokenGenerator(model_name)
         return jsonify({'status': 'success', 'message': 'Model initialized successfully'})
     except Exception as e:

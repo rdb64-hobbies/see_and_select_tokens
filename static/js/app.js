@@ -4,9 +4,11 @@ class TokenVisualizer {
         this.currentTokens = [];
         this.originalPrompt = '';
         this.generatedTokensData = [];
+        this.availableModels = [];
         
         this.initializeElements();
         this.bindEvents();
+        this.loadAvailableModels();
     }
 
     initializeElements() {
@@ -30,6 +32,7 @@ class TokenVisualizer {
         this.generateAllBtn.addEventListener('click', () => this.generateToEnd());
         this.resetBtn.addEventListener('click', () => this.reset());
         this.promptInput.addEventListener('input', () => this.updatePromptDisplay());
+        this.modelSelect.addEventListener('change', () => this.onModelSelectionChange());
         
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
@@ -39,8 +42,66 @@ class TokenVisualizer {
         });
     }
 
+    async loadAvailableModels() {
+        try {
+            const response = await fetch('/models');
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                this.availableModels = data.models;
+                this.populateModelSelect(data.models, data.default_model);
+            } else {
+                console.error('Failed to load models:', data.message);
+                this.modelSelect.innerHTML = '<option value="">Failed to load models</option>';
+            }
+        } catch (error) {
+            console.error('Error loading models:', error);
+            this.modelSelect.innerHTML = '<option value="">Error loading models</option>';
+        }
+    }
+
+    populateModelSelect(models, defaultModel) {
+        this.modelSelect.innerHTML = '';
+        
+        // Add placeholder option
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select a model...';
+        this.modelSelect.appendChild(placeholderOption);
+        
+        // Add model options
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = `${model.name} - ${model.description}`;
+            if (model.id === defaultModel) {
+                option.selected = true;
+            }
+            this.modelSelect.appendChild(option);
+        });
+        
+        // Enable initialize button if a model is selected
+        this.onModelSelectionChange();
+    }
+
+    onModelSelectionChange() {
+        this.initializeBtn.disabled = !this.modelSelect.value;
+        // Reset model initialization status when changing models
+        if (this.isModelInitialized) {
+            this.isModelInitialized = false;
+            this.setModelStatus('', '');
+            this.generateNextBtn.disabled = true;
+            this.generateAllBtn.disabled = true;
+        }
+    }
+
     async initializeModel() {
         const modelName = this.modelSelect.value;
+        if (!modelName) {
+            alert('Please select a model first.');
+            return;
+        }
+        
         this.setModelStatus('loading', 'Initializing...');
         this.initializeBtn.disabled = true;
 
@@ -130,7 +191,8 @@ class TokenVisualizer {
                 },
                 body: JSON.stringify({ 
                     text: currentText,
-                    max_tokens: 50 
+                    max_tokens: 50,
+                    top_k: 10 
                 })
             });
 
