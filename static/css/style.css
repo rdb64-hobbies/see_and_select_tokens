@@ -202,17 +202,19 @@ select:focus, textarea:focus {
 .token:hover {
     border-color: #667eea;
     transform: scale(1.05);
+    z-index: 10000;
 }
 
 .token.selected {
     border-color: #e17055;
     border-width: 2px;
+    z-index: 10000;
 }
 
 /* Probability-based background colors */
-.token.prob-very-high { background-color: rgba(46, 204, 113, 0.8); }
-.token.prob-high { background-color: rgba(52, 152, 219, 0.7); }
-.token.prob-medium { background-color: rgba(155, 89, 182, 0.6); }
+.token.prob-very-high { background-color: rgba(52, 152, 219, 0.8); }
+.token.prob-high { background-color: rgba(46, 204, 113, 0.7); }
+.token.prob-medium { background-color: rgba(241, 196, 15, 0.6); }
 .token.prob-low { background-color: rgba(230, 126, 34, 0.5); }
 .token.prob-very-low { background-color: rgba(231, 76, 60, 0.4); }
 
@@ -224,7 +226,7 @@ select:focus, textarea:focus {
     border: 1px solid #ddd;
     border-radius: 5px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
+    z-index: 10001;
     min-width: 200px;
     max-height: 300px;
     overflow-y: auto;

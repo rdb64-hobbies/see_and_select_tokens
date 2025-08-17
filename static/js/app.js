@@ -250,10 +250,10 @@ class TokenVisualizer {
     }
 
     getProbabilityClass(probability) {
-        if (probability > 0.7) return 'prob-very-high';
-        if (probability > 0.5) return 'prob-high';
-        if (probability > 0.3) return 'prob-medium';
-        if (probability > 0.1) return 'prob-low';
+        if (probability > 0.6) return 'prob-very-high';
+        if (probability > 0.25) return 'prob-high';
+        if (probability > 0.1) return 'prob-medium';
+        if (probability > 0.03) return 'prob-low';
         return 'prob-very-low';
     }
 

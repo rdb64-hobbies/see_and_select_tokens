@@ -110,7 +110,7 @@ Models are automatically downloaded on first use and cached locally.
 - Token generation typically takes 100-500ms per token
 - Memory usage: ~1-4GB depending on model size
 
-## Software Development
+## Software Development and Version History
 
 Development was done almost entirely by Windsurf Cascade using Claude Sonnet 4 (BYOK).
 
@@ -135,3 +135,7 @@ Included the top_k parameter in generate_to_end to be consistent with generate_n
 Made model selection configurable through a configuration file system. Done by Cascade with the following prompt:
 
 > Now let's make the set of available models in the model-select menu be configurable. Take the list of available models from a configuaration file. Also, remove the gpt2 default from the back-end functions.
+
+### Version 0.1.3
+
+Changed the token colors and probability thresholds (done by hand). Fixed the problem with the dropdown menu appearing below the generated tokens (done by Cascade).
