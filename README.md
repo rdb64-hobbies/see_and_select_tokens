@@ -111,7 +111,10 @@ Models are automatically downloaded on first use and cached locally.
 ## Performance Notes
 
 - First model initialization may take 1-2 minutes
-- GPU acceleration is used automatically if available
+- GPU acceleration is used automatically if available:
+  - **CUDA** (NVIDIA GPUs) - preferred
+  - **MPS** (Apple Silicon GPUs) - for Mac with M1/M2/M3 chips
+  - **CPU** - fallback option
 - Token generation typically takes 100-500ms per token
 - Memory usage: depends on model size
 
@@ -154,3 +157,7 @@ Added comprehensive sampling parameter controls with sliders for temperature, to
 ### Version 0.1.5
 
 Added command-line arguments for host and port. Done by Cascade.
+
+### Version 0.1.6
+
+Added MPS (Metal Performance Shaders) support for Apple Silicon GPU acceleration. The device detection now prioritizes CUDA > MPS > CPU, providing significant performance improvements on Mac with M1/M2/M3 chips. Done by Cascade.

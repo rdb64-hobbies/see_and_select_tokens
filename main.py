@@ -19,7 +19,12 @@ config = load_config()
 class TokenGenerator:
     def __init__(self, model_name):
         """Initialize the token generator with a pre-trained model."""
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        elif torch.backends.mps.is_available():
+            self.device = torch.device("mps")
+        else:
+            self.device = torch.device("cpu")
         print(f"Using device: {self.device}")
         
         # Load tokenizer and model
