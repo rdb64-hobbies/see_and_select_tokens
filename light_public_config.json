@@ -7,6 +7,7 @@
         }
     ],
     "default_model": "gpt2",
+
     "sampling_parameters": {
         "temperature": {
             "min": 0.1,
@@ -27,6 +28,7 @@
             "step": 1
         }
     },
+
     "server": {
         "host": "0.0.0.0",
         "port": 8080
