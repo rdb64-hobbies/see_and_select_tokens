@@ -1,6 +1,6 @@
-# LLM Token Visualizer
+# See and Select Tokens
 
-A web application that allows users to visualize and interact with individual tokens as they are generated from a Language Model (LLM). Users can see token probabilities, select alternative tokens, and observe how different choices affect the generation process.
+A web application that allows users to visualize and interact with individual tokens as they are generated from a Large Language Model (LLM). Users can see token probabilities, select alternative tokens, and observe how different sampling parameters affect the generation process.
 
 ## Features
 
@@ -161,3 +161,7 @@ Added command-line arguments for host and port. Done by Cascade.
 ### Version 0.1.6
 
 Added MPS (Metal Performance Shaders) support for Apple Silicon GPU acceleration. The device detection now prioritizes CUDA > MPS > CPU, providing significant performance improvements on Mac with M1/M2/M3 chips. Done by Cascade.
+
+### Version 0.1.7
+
+Changed title.
