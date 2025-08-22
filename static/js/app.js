@@ -48,10 +48,17 @@ class TokenVisualizer {
         this.topPSlider.addEventListener('input', () => this.updateSliderValue('top-p'));
         this.topKSlider.addEventListener('input', () => this.updateSliderValue('top-k'));
         
+        // Help button events
+        this.bindHelpEvents();
+        
         // Close dropdowns when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.token')) {
                 this.closeAllDropdowns();
+            }
+            // Close help tooltips when clicking outside
+            if (!e.target.closest('.button-with-help') && !e.target.closest('.section-header-with-help') && !e.target.closest('.header-with-help')) {
+                this.closeAllHelpTooltips();
             }
         });
     }
@@ -401,6 +408,53 @@ class TokenVisualizer {
         return text;
     }
 
+    bindHelpEvents() {
+        const helpButtons = document.querySelectorAll('.help-btn');
+        helpButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const helpType = btn.getAttribute('data-help');
+                this.toggleHelpTooltip(btn, helpType);
+            });
+        });
+    }
+
+    toggleHelpTooltip(helpBtn, helpType) {
+        // Close all other tooltips first
+        this.closeAllHelpTooltips();
+        
+        // Check if this tooltip is already shown
+        const existingTooltip = helpBtn.parentElement.querySelector('.help-tooltip');
+        if (existingTooltip) {
+            existingTooltip.remove();
+            return;
+        }
+
+        // Create and show tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'help-tooltip show';
+        tooltip.innerHTML = this.getHelpText(helpType);
+        
+        helpBtn.parentElement.appendChild(tooltip);
+    }
+
+    getHelpText(helpType) {
+        const helpTexts = {
+            'initialize': 'Load and initialize the selected model.',
+            'generate-next': 'Generate a single next token.',
+            'generate-all': 'Continue generating tokens up to a maximum length (50) or until the model decides to stop.',
+            'reset': 'Clear all generated text and start over with a new prompt.',
+            'generated-text': 'Each token is color-coded by its probability from red=low to blue=high. Click any token to see the alternatives considered as determined by the Top-p and Top-k parameters up to a fixed maximum (12). Select an alternatve token to restart generation from that point.',
+            'how-to-use': 'Step-by-step usage: 1) Select a model and click "Initialize Model". 2) Enter your starting text in the prompt area. 3) Adjust sampling parameters (Temperature, Top-p, Top-k) if desired. 4) Click "Generate Next Token" or "Generate to End". 5) Click any generated token to explore alternatives and change the generation path.'
+        };
+        return helpTexts[helpType] || 'Help information not available.';
+    }
+
+    closeAllHelpTooltips() {
+        const tooltips = document.querySelectorAll('.help-tooltip');
+        tooltips.forEach(tooltip => tooltip.remove());
+    }
+
     reset() {
         this.generatedTokensData = [];
         this.originalPrompt = '';
@@ -409,6 +463,7 @@ class TokenVisualizer {
         this.generatedTokensSpan.innerHTML = '';
         this.tokenDetails.innerHTML = 'No tokens generated yet.';
         this.closeAllDropdowns();
+        this.closeAllHelpTooltips();
     }
 }
 

@@ -10,7 +10,10 @@
     <div class="container">
         <header>
             <h1>See and Select Tokens</h1>
-            <p>An LLM token sampling visualizer</p>
+            <div class="header-with-help">
+                <p>An LLM token sampling visualizer</p>
+                <button class="help-btn" data-help="how-to-use">?</button>
+            </div>
         </header>
 
         <div class="controls">
@@ -19,7 +22,10 @@
                 <select id="model-select">
                     <option value="">Loading models...</option>
                 </select>
-                <button id="initialize-btn" class="btn btn-primary" disabled>Initialize Model</button>
+                <div class="button-with-help">
+                    <button id="initialize-btn" class="btn btn-primary" disabled>Initialize Model</button>
+                    <button class="help-btn" data-help="initialize">?</button>
+                </div>
                 <span id="model-status" class="status"></span>
             </div>
 
@@ -48,14 +54,26 @@
             </div>
 
             <div class="generation-controls">
-                <button id="generate-next-btn" class="btn btn-secondary" disabled>Generate Next Token</button>
-                <button id="generate-all-btn" class="btn btn-secondary" disabled>Generate to End</button>
-                <button id="reset-btn" class="btn btn-danger">Reset</button>
+                <div class="button-with-help">
+                    <button id="generate-next-btn" class="btn btn-secondary" disabled>Generate Next Token</button>
+                    <button class="help-btn" data-help="generate-next">?</button>
+                </div>
+                <div class="button-with-help">
+                    <button id="generate-all-btn" class="btn btn-secondary" disabled>Generate to End</button>
+                    <button class="help-btn" data-help="generate-all">?</button>
+                </div>
+                <div class="button-with-help">
+                    <button id="reset-btn" class="btn btn-danger">Reset</button>
+                    <button class="help-btn" data-help="reset">?</button>
+                </div>
             </div>
         </div>
 
         <div class="output-section">
-            <h3>Generated Text:</h3>
+            <div class="section-header-with-help">
+                <h3>Generated Text:</h3>
+                <button class="help-btn" data-help="generated-text">?</button>
+            </div>
             <div id="generated-text" class="text-display">
                 <span class="prompt-text"></span>
                 <span class="generated-tokens"></span>
