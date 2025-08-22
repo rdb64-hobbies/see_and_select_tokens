@@ -1,32 +1,12 @@
 {
     "available_models": [
         {
-            "id": "google/gemma-3-270m",
-            "name": "GEMMA-3-270M",
-            "description": "270M parameters, from Google"
-        },
-        {
-            "id": "meta-llama/Llama-3.2-1B",
-            "name": "Llama-3.2-1B",
-            "description": "1B parameters, from Meta"
-        },
-        {
-            "id": "microsoft/Phi-3-mini-4k-instruct",
-            "name": "Phi-3-Mini-4K-Instruct",
-            "description": "4B parameters, from Microsoft"
-        },
-        {
-            "id": "Qwen/Qwen3-4B",
-            "name": "Qwen3-4B",
-            "description": "4B parameters, from Qwen"
-        },
-        {
             "id": "gpt2",
             "name": "GPT-2",
             "description": "124M parameters, from OpenAI"
         }
     ],
-    "default_model": "google/gemma-3-270m",
+    "default_model": "gpt2",
     "sampling_parameters": {
         "temperature": {
             "min": 0.1,

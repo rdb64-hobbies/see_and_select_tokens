@@ -169,3 +169,7 @@ Changed title.
 ### Version 0.1.8
 
 Put in help buttons to explain how to use the app and what each thing does. Mostly done by Cascade.
+
+### Version 0.2.0
+
+Added Dockerfile to build a Docker image for the application.
