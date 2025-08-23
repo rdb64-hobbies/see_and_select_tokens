@@ -1,3 +1,15 @@
+---
+title: See and Select Tokens
+emoji: 🎯
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+python_version: 3.13
+pinned: false
+license: mit
+---
+
 # See and Select Tokens
 
 A web application that allows users to visualize and interact with individual tokens as they are generated from a Large Language Model (LLM). Users can see token probabilities, select alternative tokens, and observe how different sampling parameters affect the generation process.
@@ -173,3 +185,7 @@ Put in help buttons to explain how to use the app and what each thing does. Most
 ### Version 0.2.0
 
 Added Dockerfile to build a Docker image for the application.
+
+### Version 0.2.1
+
+Added metadata to this README file for Hugging Face Spaces.
