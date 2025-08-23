@@ -1,6 +1,6 @@
 ---
 title: See and Select Tokens
-emoji: 🎯
+emoji: 🔤
 colorFrom: blue
 colorTo: purple
 sdk: docker
